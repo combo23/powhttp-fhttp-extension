@@ -1,0 +1,8 @@
+[package]
+name = "fhttp_headers"
+version = "0.0.1"
+edition = "2026"
+
+[dependencies]
+powhttp-sdk = "0.1"
+tokio = { version = "1", features = ["full"] }

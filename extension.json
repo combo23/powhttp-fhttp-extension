@@ -1,0 +1,6 @@
+{
+    "name": "fhttp Headers",
+    "version": "0.1.0",
+    "description": "Copy request headers in fhttp (Go) format",
+    "command": "./target/release/fhttp_headers"
+}
