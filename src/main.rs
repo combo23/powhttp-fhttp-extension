@@ -6,7 +6,7 @@ async fn main() -> Result<(), Error> {
         handle
             .extend_context_menu_single(ContextMenuItemSingle::new(
                 "copy-fhttp-headers",
-                "Copy to fhttp",
+                "Copy as fhttp headers (Go)",
                 async |ctx: SingleEntryContext, handle: ExtensionHandle| {
                     let entry = handle
                         .get_session_entry(ctx.session_id, ctx.entry_id)
@@ -33,8 +33,15 @@ async fn main() -> Result<(), Error> {
                         .filter(|(name, _)| !name.starts_with(':'))
                         .collect();
 
+                    // Filter out content-length and cookie headers
+                    let filtered_headers: Vec<&(String, String)> = regular_headers
+                        .iter()
+                        .filter(|(name, _)| name != "content-length" && name != "cookie")
+                        .copied()
+                        .collect();
+
                     // Find the max header name length for alignment (consider both regular + pseudo + order keys)
-                    let max_name_len = regular_headers
+                    let max_name_len = filtered_headers
                         .iter()
                         .map(|(name, _)| name.len() + 2) // +2 for quotes
                         .chain(std::iter::once("http.HeaderOrderKey".len()))
@@ -45,7 +52,7 @@ async fn main() -> Result<(), Error> {
                     let mut lines = Vec::new();
                     lines.push("req.Header = http.Header{".to_string());
 
-                    for (name, value) in &regular_headers {
+                    for (name, value) in &filtered_headers {
                         let quoted_name = format!("\"{}\"", name);
                         let padding = max_name_len - quoted_name.len();
                         let escaped_value = value.replace('\\', "\\\\").replace('"', "\\\"");
